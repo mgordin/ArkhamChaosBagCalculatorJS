@@ -1,9 +1,9 @@
 // Params
 var autofail_value = -999;
-var skull_value = 0;
-var cultist_value = 0;
-var tablet_value = 0;
-var squiggle_value = 0;
+var skull_value = -2;
+var cultist_value = -2;
+var tablet_value = -3;
+var squiggle_value = -4;
 var variable_tokens = ['Skull', 'Cultist', 'Tablet', 'Squiggle']
 
 // Functions
@@ -30,30 +30,36 @@ function calculationStep(remainingOptions, previousTotal, probMod, pastFrost, al
             allResults.push([total, probMod])
         }
     });
+
+    //return allResults;
 }
 
 function aggregate(results) {
     var prob = new Object();
-    for (i in range(-25, 21).concat([-999])) {
+    r = range(-25, 21).concat([-999])
+    r.forEach(function (value, i) {
         //prob[i] = sum([p for v, p in results if v == i])* 100
         const filteredResults = results.filter(function (array) {
-            return array.includes(i)
+            return array.includes(value)
         })
-        console.log(filteredResults)
-        const probSumFunction = (sum, curr) => sum + curr[1];
-        prob[i] = filteredResults.reduce(probSumFunction);
+        if (filteredResults.length != 0) {
+            //console.log(filteredResults[0], filteredResults[0][1], typeof (filteredResults[0][1]))
+            const probSumFunction = (sum, curr) => sum + curr[1];
+            prob[value] = filteredResults.reduce(probSumFunction, 0) * 100;
+            //console.log(prob)
+        }
+    })
 
-        var probCumul = new Object();
-        probCumul[-2] = sumStuffUp(prob, 1);
-        probCumul[-1] = sumStuffUp(prob, 0);
-        probCumul[0] = sumStuffUp(prob, -1);
-        probCumul[1] = sumStuffUp(prob, -2);
-        probCumul[2] = sumStuffUp(prob, -3);
-        probCumul[3] = sumStuffUp(prob, -4);
-        probCumul[4] = sumStuffUp(prob, -5);
-        probCumul[5] = sumStuffUp(prob, -6);
-        probCumul[6] = sumStuffDown(prob, -6);
-    }
+    var probCumul = new Object();
+    probCumul[-2] = sumStuffUp(prob, 1);
+    probCumul[-1] = sumStuffUp(prob, 0);
+    probCumul[0] = sumStuffUp(prob, -1);
+    probCumul[1] = sumStuffUp(prob, -2);
+    probCumul[2] = sumStuffUp(prob, -3);
+    probCumul[3] = sumStuffUp(prob, -4);
+    probCumul[4] = sumStuffUp(prob, -5);
+    probCumul[5] = sumStuffUp(prob, -6);
+    probCumul[6] = sumStuffDown(prob, -6);
 
     return probCumul
 }
@@ -89,8 +95,8 @@ var options = [[1, false, 'Star']].concat(
     [[-3, false, '-3']],
     [[tablet_value, false, 'Tablet']],
     [[-4, false, '-4']],
-    [[skull_value, false, 'Skull']],
-    [[squiggle_value, false, 'Squiggle']],
+    [[skull_value, false, 'Skull'], [skull_value, false, 'Skull']],
+    [[squiggle_value, false, 'Squiggle'], [squiggle_value, false, 'Squiggle']],
     [[-1, true, 'Frost'], [-1, true, 'Frost'], [-1, true, 'Frost']],
     [[autofail_value, false, 'Autofail']]
 );
