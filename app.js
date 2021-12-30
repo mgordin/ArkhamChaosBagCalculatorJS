@@ -12,8 +12,24 @@ function range(start, end) {
     return [start, ...range(start + 1, end)];
 }
 
-function calculationStep(remainingOptions, previousTotal, probMod, pastFrost, first) {
-
+function calculationStep(remainingOptions, previousTotal, probMod, pastFrost, allResults) {
+    remainingOptions.forEach(function (token, i) {
+        var total = previousTotal + token[0];
+        if (probMod < 0.000001) {
+            allResults.push([autofail_value, probMod])
+        } else if (token[1]) {
+            if (!(pastFrost && token[2] == 'Frost')) {
+                calculationStep(
+                    remainingOptions.slice(0, i).concat(remainingOptions.slice(i + 1)), total, probMod / (remainingOptions.length - 1), token[2] == 'Frost', allResults)
+            } else {
+                allResults.push([autofail_value, probMod])
+            }
+        } else if (token[0] == autofail_value) {
+            allResults.push([autofail_value, probMod])
+        } else {
+            allResults.push([total, probMod])
+        }
+    });
 }
 
 function aggregate(results) {
@@ -23,8 +39,9 @@ function aggregate(results) {
         const filteredResults = results.filter(function (array) {
             return array.includes(i)
         })
-        const probSum = (sum, curr) => sum + curr[1];
-        prob[i] = probSum;
+        console.log(filteredResults)
+        const probSumFunction = (sum, curr) => sum + curr[1];
+        prob[i] = filteredResults.reduce(probSumFunction);
 
         var probCumul = new Object();
         probCumul[-2] = sumStuffUp(prob, 1);
@@ -60,5 +77,26 @@ function sumStuffDown(prob, target) {
     }
     return temp;
 }
+
+// Test it out
+
+var options = [[1, false, 'Star']].concat(
+    [[1, false, '+1']],
+    [[0, false, '0'], [0, false, '0']],
+    [[-1, false, '-1'], [-1, false, '-1'], [-1, false, '-1']],
+    [[-2, false, '-2'], [-2, false, '-2']],
+    [[cultist_value, false, 'Cultist'], [cultist_value, false, 'Cultist']],
+    [[-3, false, '-3']],
+    [[tablet_value, false, 'Tablet']],
+    [[-4, false, '-4']],
+    [[skull_value, false, 'Skull']],
+    [[squiggle_value, false, 'Squiggle']],
+    [[-1, true, 'Frost'], [-1, true, 'Frost'], [-1, true, 'Frost']],
+    [[autofail_value, false, 'Autofail']]
+);
+
+var allResults = []
+calculationStep(options, 0, 1 / options.length, false, allResults)
+cumulative = aggregate(allResults)
 
 // Vue stuff
