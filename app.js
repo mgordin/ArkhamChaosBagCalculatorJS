@@ -38,7 +38,7 @@ var data = {
     },
     redraw_max: 4,
     variable_tokens: ['skull', 'cultist', 'tablet', 'squiggle'],
-    abilitiesActive: null,
+    abilitiesActive: [],
     abilityOptions: [
         { text: 'Jim Culver', value: 'JimCulver' },
         { text: 'Ritual Candles', value: 'RitualCandles' }
@@ -66,6 +66,29 @@ function makeBag(tokens) {
         }
     };
     return bag
+}
+
+function prepareModifiers(abilitiesActive, abilityEffects, modifiers) {
+    if (abilitiesActive) {
+        console.log(abilitiesActive)
+        abilitiesActive.forEach(function(ability, i) {
+            console.log(ability)
+            var abilityEffect = abilityEffects[ability];
+            console.log(abilityEffect)
+            for (const [k, v] of Object.entries(abilityEffect)) {
+                console.log(k, v)
+                console.log(modifiers[k])
+                if (modifiers[k].length == 0) {
+                    console.log('replacing')
+                    modifiers[k] = v
+                } else if (modifiers[k][0] == 'adjust') {
+                    console.log('iterative adjust')
+                    modifiers[k][1] = modifiers[k][1] + abilityEffect[1]
+                }
+            };
+        })
+    }
+    console.log(modifiers)
 }
 
 // Functions
@@ -144,10 +167,10 @@ function sumStuffDown(prob, target) {
 
 // Test it out
 
-function run(tokens, modifiers, redraw_max) {
+function run(tokens, abilitiesActive, abilityEffects, modifiers, redraw_max) {
     var allResults = []
-        // Fix
     bag = makeBag(tokens)
+    prepareModifiers(abilitiesActive, abilityEffects, modifiers)
     calculationStep(bag, 0, 1 / bag.length, null, 1, tokens['autofail'][1], redraw_max, allResults, modifiers)
     cumulative = aggregate(allResults)
     return cumulative
@@ -257,7 +280,7 @@ var app10 = new Vue({
     data: data,
     methods: {
         getProbabilitiesMessage: function() {
-            probabilityPlot(run(this.tokens, this.modifiers, this.redraw_max))
+            probabilityPlot(run(this.tokens, this.abilitiesActive, this.abilityEffects, this.modifiers, this.redraw_max))
         }
     }
 })
