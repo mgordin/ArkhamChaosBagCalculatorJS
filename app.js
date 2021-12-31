@@ -23,6 +23,8 @@ var data = {
     message: 'Hello Vue.js!'
 }
 
+// Bag is a list of lists, each interior list is one token as 
+// [value as number, redraw as boolean, name as string, autofail after as string]
 function makeBag(tokens) {
     var bag = []
     for (const [token_name, token] of Object.entries(tokens)) {
@@ -39,27 +41,22 @@ function range(start, end) {
     return [start, ...range(start + 1, end)];
 }
 
-function calculationStep(remainingOptions, previousTotal, probMod, pastFrost, drawCount, autofail_value, redraw_max, allResults) {
+function calculationStep(remainingOptions, previousTotal, probMod, lastDraw, drawCount, autofail_value, redraw_max, allResults) {
     remainingOptions.forEach(function (token, i) {
         var total = previousTotal + token[0];
-        //if (probMod < 0.000001) {
-        if (drawCount > redraw_max) {
-            allResults.push([autofail_value, probMod])
-        } else if (token[1]) {
-            if (!(pastFrost && token[2] == 'Frost')) {
-                calculationStep(
-                    remainingOptions.slice(0, i).concat(remainingOptions.slice(i + 1)), total, probMod / (remainingOptions.length - 1), token[2] == 'Frost', drawCount + 1, autofail_value, redraw_max, allResults)
-            } else {
-                allResults.push([autofail_value, probMod])
-            }
-        } else if (token[0] == autofail_value) {
-            allResults.push([autofail_value, probMod])
-        } else {
-            allResults.push([total, probMod])
+        if (drawCount > redraw_max) {  // If this draw is too many redraws - treat as an autofail to speed up calculation
+            allResults.push([autofail_value, probMod]);
+        } else if (lastDraw && lastDraw == token[3]) { // If the previous draw would make this an autofail, do that
+            allResults.push([autofail_value, probMod]);
+        } else if (token[1]) {  // If this is a token that prompts a redraw, do that
+            calculationStep(
+                remainingOptions.slice(0, i).concat(remainingOptions.slice(i + 1)), total, probMod / (remainingOptions.length - 1), token[2], drawCount + 1, autofail_value, redraw_max, allResults)
+        } else if (token[0] == autofail_value) {  // Special case so autofail always has same value
+            allResults.push([autofail_value, probMod]);
+        } else {  // No redraw - just spit out the current total and probability
+            allResults.push([total, probMod]);
         }
     });
-
-    //return allResults;
 }
 
 function aggregate(results) {
@@ -118,7 +115,7 @@ function run(tokens, redraw_max) {
     var allResults = []
     // Fix
     bag = makeBag(tokens)
-    calculationStep(bag, 0, 1 / bag.length, false, 1, tokens['autofail'][1], redraw_max, allResults)
+    calculationStep(bag, 0, 1 / bag.length, null, 1, tokens['autofail'][1], redraw_max, allResults)
     cumulative = aggregate(allResults)
     return cumulative
 }
