@@ -45,7 +45,7 @@ var data = {
         { text: "Frost", value: "frost" },
         { text: "Tablet", value: "tablet" },
         { text: "Skull", value: "skull" },
-        { text: "Squiggle", value: "squiggle" },
+        { text: "Squiggle", value: "squiggle" }
 
     ],
     abilitiesActive: [],
