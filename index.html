@@ -29,124 +29,131 @@
                             <td><input v-model.number="tokens['+1'][0]" type="number" min="0"></td>
                             <td><input v-model.number="tokens['+1'][1]" type="number"></td>
                             <td><input v-model="tokens['+1'][2]" type="checkbox"></td>
-                            <td><input v-model.number="tokens['+1'][3]"></td>
+                            <td>
+                                <select v-model="tokens['+1'][3]">
+                                    <option v-for="option in tokenOptions" v-bind:value="option.value">
+                                        {{ option.text }}
+                                      </option>
+                                </select>
+                            </td>
                         </tr>
                         <tr>
                             <td>0</td>
                             <td><input v-model.number="tokens['0'][0]" type="number" min="0"></td>
                             <td><input v-model.number="tokens['0'][1]" type="number"></td>
                             <td><input v-model="tokens['0'][2]" type="checkbox"></td>
-                            <td><input v-model.number="tokens['0'][3]"></td>
+                            <td><input v-model="tokens['0'][3]"></td>
                         </tr>
                         <tr>
                             <td>-1</td>
                             <td><input v-model.number="tokens['-1'][0]" type="number" min="0"></td>
                             <td><input v-model.number="tokens['-1'][1]" type="number"></td>
                             <td><input v-model="tokens['-1'][2]" type="checkbox"></td>
-                            <td><input v-model.number="tokens['-1'][3]"></td>
+                            <td><input v-model="tokens['-1'][3]"></td>
                         </tr>
                         <tr>
                             <td>-2</td>
                             <td><input v-model.number="tokens['-2'][0]" type="number" min="0"></td>
                             <td><input v-model.number="tokens['-2'][1]" type="number"></td>
                             <td><input v-model="tokens['-2'][2]" type="checkbox"></td>
-                            <td><input v-model.number="tokens['-2'][3]"></td>
+                            <td><input v-model="tokens['-2'][3]"></td>
                         </tr>
                         <tr>
                             <td>-3</td>
                             <td><input v-model.number="tokens['-3'][0]" type="number" min="0"></td>
                             <td><input v-model.number="tokens['-3'][1]" type="number"></td>
                             <td><input v-model="tokens['-3'][2]" type="checkbox"></td>
-                            <td><input v-model.number="tokens['-3'][3]"></td>
+                            <td><input v-model="tokens['-3'][3]"></td>
                         </tr>
                         <tr>
                             <td>-4</td>
                             <td><input v-model.number="tokens['-4'][0]" type="number" min="0"></td>
                             <td><input v-model.number="tokens['-4'][1]" type="number"></td>
                             <td><input v-model="tokens['-4'][2]" type="checkbox"></td>
-                            <td><input v-model.number="tokens['-4'][3]"></td>
+                            <td><input v-model="tokens['-4'][3]"></td>
                         </tr>
                         <tr>
                             <td>-5</td>
                             <td><input v-model.number="tokens['-5'][0]" type="number" min="0"></td>
                             <td><input v-model.number="tokens['-5'][1]" type="number"></td>
                             <td><input v-model="tokens['-5'][2]" type="checkbox"></td>
-                            <td><input v-model.number="tokens['-5'][3]"></td>
+                            <td><input v-model="tokens['-5'][3]"></td>
                         </tr>
                         <tr>
                             <td>Skull</td>
                             <td><input v-model.number="tokens['skull'][0]" type="number" min="0"></td>
                             <td><input v-model.number="tokens['skull'][1]" type="number"></td>
                             <td><input v-model="tokens['skull'][2]" type="checkbox"></td>
-                            <td><input v-model.number="tokens['skull'][3]"></td>
+                            <td><input v-model="tokens['skull'][3]"></td>
                         </tr>
                         <tr>
                             <td>Cultist</td>
                             <td><input v-model.number="tokens['cultist'][0]" type="number" min="0"></td>
                             <td><input v-model.number="tokens['cultist'][1]" type="number"></td>
                             <td><input v-model="tokens['cultist'][2]" type="checkbox"></td>
-                            <td><input v-model.number="tokens['cultist'][3]"></td>
+                            <td><input v-model="tokens['cultist'][3]"></td>
                         </tr>
                         <tr>
                             <td>Tablet</td>
                             <td><input v-model.number="tokens['tablet'][0]" type="number" min="0"></td>
                             <td><input v-model.number="tokens['tablet'][1]" type="number"></td>
                             <td><input v-model="tokens['tablet'][2]" type="checkbox"></td>
-                            <td><input v-model.number="tokens['tablet'][3]"></td>
+                            <td><input v-model="tokens['tablet'][3]"></td>
                         </tr>
                         <tr>
                             <td>Squiggle</td>
                             <td><input v-model.number="tokens['squiggle'][0]" type="number" min="0"></td>
                             <td><input v-model.number="tokens['squiggle'][1]" type="number"></td>
                             <td><input v-model="tokens['squiggle'][2]" type="checkbox"></td>
-                            <td><input v-model.number="tokens['squiggle'][3]"></td>
+                            <td><input v-model="tokens['squiggle'][3]"></td>
                         </tr>
                         <tr>
                             <td>Bless</td>
                             <td><input v-model.number="tokens['bless'][0]" type="number" min="0"></td>
                             <td><input v-model.number="tokens['bless'][1]" type="number"></td>
                             <td><input v-model="tokens['bless'][2]" type="checkbox"></td>
-                            <td><input v-model.number="tokens['bless'][3]"></td>
+                            <td><input v-model="tokens['bless'][3]"></td>
                         </tr>
                         <tr>
                             <td>Curse</td>
                             <td><input v-model.number="tokens['curse'][0]" type="number" min="0"></td>
                             <td><input v-model.number="tokens['curse'][1]" type="number"></td>
                             <td><input v-model="tokens['curse'][2]" type="checkbox"></td>
-                            <td><input v-model.number="tokens['curse'][3]"></td>
+                            <td><input v-model="tokens['curse'][3]"></td>
                         </tr>
                         <tr>
                             <td>Frost</td>
                             <td><input v-model.number="tokens['frost'][0]" type="number" min="0"></td>
                             <td><input v-model.number="tokens['frost'][1]" type="number"></td>
                             <td><input v-model="tokens['frost'][2]" type="checkbox"></td>
-                            <td><input v-model.number="tokens['frost'][3]"></td>
+                            <td><input v-model="tokens['frost'][3]"></td>
                         </tr>
                         <tr>
                             <td>Star</td>
                             <td><input v-model.number="tokens['star'][0]" type="number" min="0"></td>
                             <td><input v-model.number="tokens['star'][1]" type="number"></td>
                             <td><input v-model="tokens['star'][2]" type="checkbox"></td>
-                            <td><input v-model.number="tokens['star'][3]"></td>
+                            <td><input v-model="tokens['star'][3]"></td>
                         </tr>
                         <tr>
                             <td>Autofail</td>
                             <td><input v-model.number="tokens['autofail'][0]" type="number" min="0"></td>
                             <td><input v-model.number="tokens['autofail'][1]" type="number"></td>
                             <td><input v-model="tokens['autofail'][2]" type="checkbox"></td>
-                            <td><input v-model.number="tokens['autofail'][3]"></td>
+                            <td><input v-model="tokens['autofail'][3]"></td>
                         </tr>
                     </table>
                 </div>
             </div>
             <div class="column is-half">
                 <h1 class="title">Select abilities to be active</h1>
-                <select v-model="abilitiesActive" multiple>
-                <option v-for="option in abilityOptions" v-bind:value="option.value">
-                    {{ option.text }}
-                  </option>
-            </select>
-                <span>{{ abilitiesActive }}</span>
+                <div class="select is-multiple">
+                    <select v-model="abilitiesActive" multiple>
+                        <option v-for="option in abilityOptions" v-bind:value="option.value">
+                            {{ option.text }}
+                        </option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>

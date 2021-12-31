@@ -38,20 +38,37 @@ var data = {
     },
     redraw_max: 4,
     variable_tokens: ['skull', 'cultist', 'tablet', 'squiggle'],
+    tokenOptions: [
+        { text: "Bless", value: "bless" },
+        { text: "Curse", value: "curse" },
+        { text: "Cultist", value: "cultist" },
+        { text: "Frost", value: "frost" },
+        { text: "Tablet", value: "tablet" },
+        { text: "Skull", value: "skull" },
+        { text: "Squiggle", value: "squiggle" },
+
+    ],
     abilitiesActive: [],
     abilityOptions: [
         { text: 'Jim Culver', value: 'JimCulver' },
-        { text: 'Ritual Candles', value: 'RitualCandles' }
+        { text: 'Ritual Candles', value: 'RitualCandles1' },
+        { text: 'Ritual Candles', value: 'RitualCandles2' }
     ],
     abilityEffects: {
         'JimCulver': {
-            'skull': ['set', 0]
+            'skull': ['s', 0]
         },
-        'RitualCandles': {
-            'skull': ['adjust', 1],
-            'cultist': ['adjust', 1],
-            'tablet': ['adjust', 1],
-            'squiggle': ['adjust', 1]
+        'RitualCandles1': {
+            'skull': ['a', 1],
+            'cultist': ['a', 1],
+            'tablet': ['a', 1],
+            'squiggle': ['a', 1]
+        },
+        'RitualCandles2': {
+            'skull': ['a', 2],
+            'cultist': ['a', 2],
+            'tablet': ['a', 2],
+            'squiggle': ['a', 2]
         }
     }
 }
@@ -69,26 +86,21 @@ function makeBag(tokens) {
 }
 
 function prepareModifiers(abilitiesActive, abilityEffects, modifiers) {
-    if (abilitiesActive) {
-        console.log(abilitiesActive)
+    for (const [k, v] of Object.entries(modifiers)) {
+        modifiers[k] = [];
+    };
+    if (abilitiesActive.length != 0) {
         abilitiesActive.forEach(function(ability, i) {
-            console.log(ability)
             var abilityEffect = abilityEffects[ability];
-            console.log(abilityEffect)
             for (const [k, v] of Object.entries(abilityEffect)) {
-                console.log(k, v)
-                console.log(modifiers[k])
                 if (modifiers[k].length == 0) {
-                    console.log('replacing')
                     modifiers[k] = v
-                } else if (modifiers[k][0] == 'adjust') {
-                    console.log('iterative adjust')
-                    modifiers[k][1] = modifiers[k][1] + abilityEffect[1]
+                } else if (modifiers[k][0] == 'a') {
+                    modifiers[k][1] += abilityEffect[k][1]
                 }
             };
         })
     }
-    console.log(modifiers)
 }
 
 // Functions
@@ -97,19 +109,35 @@ function range(start, end) {
     return [start, ...range(start + 1, end)];
 }
 
+function calculateTotal(previousTotal, token, modifiers) {
+    var total = previousTotal + token[0];
+    if (modifiers[token[2]].length != 0) {
+        if (modifiers[token[2]][0] == 'a') {
+            total += modifiers[token[2]][1]
+        } else {
+            total = modifiers[token[2]][1]
+        }
+    }
+    return total
+}
+
 function calculationStep(remainingOptions, previousTotal, probMod, lastDraw, drawCount, autofail_value, redraw_max, allResults, modifiers) {
     remainingOptions.forEach(function(token, i) {
-        var total = previousTotal + token[0];
-        if (drawCount > redraw_max) { // If this draw is too many redraws - treat as an autofail to speed up calculation
-            allResults.push([autofail_value, probMod]);
-        } else if (lastDraw && lastDraw == token[3]) { // If the previous draw would make this an autofail, do that
+        // Calculate result, assuming now additional stuff happening
+        if (lastDraw && lastDraw == token[3]) { // If the previous draw would make this an autofail, do that
             allResults.push([autofail_value, probMod]);
         } else if (token[1]) { // If this is a token that prompts a redraw, do that
-            calculationStep(
-                remainingOptions.slice(0, i).concat(remainingOptions.slice(i + 1)), total, probMod / (remainingOptions.length - 1), token[2], drawCount + 1, autofail_value, redraw_max, allResults, modifiers)
+            if (drawCount + 1 > redraw_max) { // If this draw is too many redraws - treat as an autofail to speed up calculation
+                allResults.push([autofail_value, probMod]);
+            } else {
+                var total = calculateTotal(previousTotal, token, modifiers)
+                calculationStep(
+                    remainingOptions.slice(0, i).concat(remainingOptions.slice(i + 1)), total, probMod / (remainingOptions.length - 1), token[2], drawCount + 1, autofail_value, redraw_max, allResults, modifiers)
+            }
         } else if (token[0] == autofail_value) { // Special case so autofail always has same value
             allResults.push([autofail_value, probMod]);
         } else { // No redraw - just spit out the current total and probability
+            var total = calculateTotal(previousTotal, token, modifiers)
             allResults.push([total, probMod]);
         }
     });
@@ -170,55 +198,9 @@ function sumStuffDown(prob, target) {
 function run(tokens, abilitiesActive, abilityEffects, modifiers, redraw_max) {
     var allResults = []
     bag = makeBag(tokens)
+    console.log("abilityEffects in run(): ", abilityEffects)
     prepareModifiers(abilitiesActive, abilityEffects, modifiers)
     calculationStep(bag, 0, 1 / bag.length, null, 1, tokens['autofail'][1], redraw_max, allResults, modifiers)
-    cumulative = aggregate(allResults)
-    return cumulative
-}
-
-function testRun(cultist_value, tablet_value, skull_value, squiggle_value, autofail_value) {
-    console.log("Cultist value is ", cultist_value)
-    var options = [
-        [1, false, 'Star']
-    ].concat(
-        [
-            [1, false, '+1']
-        ], [
-            [0, false, '0'],
-            [0, false, '0']
-        ], [
-            [-1, false, '-1'],
-            [-1, false, '-1'],
-            [-1, false, '-1']
-        ], [
-            [-2, false, '-2'],
-            [-2, false, '-2']
-        ], [
-            [cultist_value, false, 'Cultist'],
-            [cultist_value, false, 'Cultist']
-        ], [
-            [-3, false, '-3']
-        ], [
-            [tablet_value, false, 'Tablet']
-        ], [
-            [-4, false, '-4']
-        ], [
-            [skull_value, false, 'Skull'],
-            [skull_value, false, 'Skull']
-        ], [
-            [squiggle_value, false, 'Squiggle'],
-            [squiggle_value, false, 'Squiggle']
-        ], [
-            [-1, true, 'Frost'],
-            [-1, true, 'Frost'],
-            [-1, true, 'Frost']
-        ], [
-            [autofail_value, false, 'Autofail']
-        ]
-    );
-
-    var allResults = []
-    calculationStep(options, 0, 1 / options.length, false, 1, autofail_value, allResults)
     cumulative = aggregate(allResults)
     return cumulative
 }
@@ -246,6 +228,7 @@ function probabilityPlot(p) {
         }
     }];
     var layout = {
+        title: "Chance of success",
         xaxis: {
             title: {
                 text: 'Skill Value vs. Test Difficulty',
@@ -280,6 +263,7 @@ var app10 = new Vue({
     data: data,
     methods: {
         getProbabilitiesMessage: function() {
+            console.log("abilityEffects in Vue(): ", this.abilityEffects)
             probabilityPlot(run(this.tokens, this.abilitiesActive, this.abilityEffects, this.modifiers, this.redraw_max))
         }
     }
