@@ -1,19 +1,36 @@
 // Params
-
-var skull_value = -2;
-var cultist_value = -2;
-var tablet_value = -3;
-var squiggle_value = -4;
-var autofail_value = -999;
-var variable_tokens = ['Skull', 'Cultist', 'Tablet', 'Squiggle']
-
 var data = {
-    cultist_value: -2,
-    skull_value: -2,
-    tablet_value: -3,
-    squiggle_value: -4,
-    autofail_value: -999,
+    tokens: {
+        '+1': [1, 1, false, null],
+        '0': [2, 0, false, null],
+        '-1': [3, -1, false, null],
+        '-2': [2, -2, false, null],
+        '-3': [1, -3, false, null],
+        '-4': [1, -4, false, null],
+        '-5': [0, -5, false, null],
+        'skull': [2, -2, false, null],
+        'cultist': [2, -2, false, null],
+        'tablet': [1, -3, false, null],
+        'squiggle': [2, -4, false, null],
+        'star': [1, 1, false, null],
+        'autofail': [1, -999, false, null],
+        'bless': [0, 2, true, null],
+        'curse': [0, -2, true, null],
+        'frost': [4, -1, true, 'frost']
+    },
+    redraw_max: 4,
+    variable_tokens: ['skull', 'cultist', 'tablet', 'squiggle'],
     message: 'Hello Vue.js!'
+}
+
+function makeBag(tokens) {
+    var bag = []
+    for (const [token_name, token] of Object.entries(tokens)) {
+        for (let i = 1; i <= token[0]; i++) {
+            bag.push([token[1], token[2], token_name, token[3]])
+        }
+    };
+    return bag
 }
 
 // Functions
@@ -22,16 +39,16 @@ function range(start, end) {
     return [start, ...range(start + 1, end)];
 }
 
-function calculationStep(remainingOptions, previousTotal, probMod, pastFrost, drawCount, allResults) {
+function calculationStep(remainingOptions, previousTotal, probMod, pastFrost, drawCount, autofail_value, redraw_max, allResults) {
     remainingOptions.forEach(function (token, i) {
         var total = previousTotal + token[0];
         //if (probMod < 0.000001) {
-        if (drawCount > 4) {
+        if (drawCount > redraw_max) {
             allResults.push([autofail_value, probMod])
         } else if (token[1]) {
             if (!(pastFrost && token[2] == 'Frost')) {
                 calculationStep(
-                    remainingOptions.slice(0, i).concat(remainingOptions.slice(i + 1)), total, probMod / (remainingOptions.length - 1), token[2] == 'Frost', drawCount + 1, allResults)
+                    remainingOptions.slice(0, i).concat(remainingOptions.slice(i + 1)), total, probMod / (remainingOptions.length - 1), token[2] == 'Frost', drawCount + 1, autofail_value, redraw_max, allResults)
             } else {
                 allResults.push([autofail_value, probMod])
             }
@@ -97,9 +114,11 @@ function sumStuffDown(prob, target) {
 
 // Test it out
 
-function run(options) {
+function run(tokens, redraw_max) {
     var allResults = []
-    calculationStep(options, 0, 1 / options.length, false, 1, allResults)
+    // Fix
+    bag = makeBag(tokens)
+    calculationStep(bag, 0, 1 / bag.length, false, 1, tokens['autofail'][1], redraw_max, allResults)
     cumulative = aggregate(allResults)
     return cumulative
 }
@@ -122,7 +141,7 @@ function testRun(cultist_value, tablet_value, skull_value, squiggle_value, autof
     );
 
     var allResults = []
-    calculationStep(options, 0, 1 / options.length, false, 1, allResults)
+    calculationStep(options, 0, 1 / options.length, false, 1, autofail_value, allResults)
     cumulative = aggregate(allResults)
     return cumulative
 }
@@ -144,10 +163,37 @@ function probabilityPlot(p) {
         y: yValue,
         type: 'bar',
         text: yValue.map(String),
-        textposition: 'auto'
+        textposition: 'auto',
+        textfont: {
+            size: 18
+        }
     }];
+    var layout = {
+        xaxis: {
+            title: {
+                text: 'Skill Value vs. Test Difficulty',
+                font: {
+                    size: 18
+                }
+            },
+            tickfont: {
+                size: 16
+            }
+        },
+        yaxis: {
+            title: {
+                text: 'Probability of Success',
+                font: {
+                    size: 18
+                }
+            },
+            tickfont: {
+                size: 16
+            }
+        }
+    }
 
-    return Plotly.newPlot('myDiv', data);
+    return Plotly.newPlot('probPlot', data, layout);
 }
 
 // Vue stuff
@@ -157,8 +203,7 @@ var app10 = new Vue({
     data: data,
     methods: {
         getProbabilitiesMessage: function () {
-            this.message = JSON.stringify(testRun(this.cultist_value, this.tablet_value, this.skull_value, this.squiggle_value, this.autofail_value))
-            probabilityPlot(testRun(this.cultist_value, this.tablet_value, this.skull_value, this.squiggle_value, this.autofail_value))
+            probabilityPlot(run(this.tokens, this.redraw_max))
         }
     }
 })
