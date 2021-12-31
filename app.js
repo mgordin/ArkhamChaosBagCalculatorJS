@@ -18,9 +18,42 @@ var data = {
         'curse': [0, -2, true, null],
         'frost': [4, -1, true, 'frost']
     },
+    modifiers: {
+        '+1': [],
+        '0': [],
+        '-1': [],
+        '-2': [],
+        '-3': [],
+        '-4': [],
+        '-5': [],
+        'skull': [],
+        'cultist': [],
+        'tablet': [],
+        'squiggle': [],
+        'star': [],
+        'autofail': [],
+        'bless': [],
+        'curse': [],
+        'frost': []
+    },
     redraw_max: 4,
     variable_tokens: ['skull', 'cultist', 'tablet', 'squiggle'],
-    message: 'Hello Vue.js!'
+    abilitiesActive: null,
+    abilityOptions: [
+        { text: 'Jim Culver', value: 'JimCulver' },
+        { text: 'Ritual Candles', value: 'RitualCandles' }
+    ],
+    abilityEffects: {
+        'JimCulver': {
+            'skull': ['set', 0]
+        },
+        'RitualCandles': {
+            'skull': ['adjust', 1],
+            'cultist': ['adjust', 1],
+            'tablet': ['adjust', 1],
+            'squiggle': ['adjust', 1]
+        }
+    }
 }
 
 // Bag is a list of lists, each interior list is one token as 
@@ -41,19 +74,19 @@ function range(start, end) {
     return [start, ...range(start + 1, end)];
 }
 
-function calculationStep(remainingOptions, previousTotal, probMod, lastDraw, drawCount, autofail_value, redraw_max, allResults) {
-    remainingOptions.forEach(function (token, i) {
+function calculationStep(remainingOptions, previousTotal, probMod, lastDraw, drawCount, autofail_value, redraw_max, allResults, modifiers) {
+    remainingOptions.forEach(function(token, i) {
         var total = previousTotal + token[0];
-        if (drawCount > redraw_max) {  // If this draw is too many redraws - treat as an autofail to speed up calculation
+        if (drawCount > redraw_max) { // If this draw is too many redraws - treat as an autofail to speed up calculation
             allResults.push([autofail_value, probMod]);
         } else if (lastDraw && lastDraw == token[3]) { // If the previous draw would make this an autofail, do that
             allResults.push([autofail_value, probMod]);
-        } else if (token[1]) {  // If this is a token that prompts a redraw, do that
+        } else if (token[1]) { // If this is a token that prompts a redraw, do that
             calculationStep(
-                remainingOptions.slice(0, i).concat(remainingOptions.slice(i + 1)), total, probMod / (remainingOptions.length - 1), token[2], drawCount + 1, autofail_value, redraw_max, allResults)
-        } else if (token[0] == autofail_value) {  // Special case so autofail always has same value
+                remainingOptions.slice(0, i).concat(remainingOptions.slice(i + 1)), total, probMod / (remainingOptions.length - 1), token[2], drawCount + 1, autofail_value, redraw_max, allResults, modifiers)
+        } else if (token[0] == autofail_value) { // Special case so autofail always has same value
             allResults.push([autofail_value, probMod]);
-        } else {  // No redraw - just spit out the current total and probability
+        } else { // No redraw - just spit out the current total and probability
             allResults.push([total, probMod]);
         }
     });
@@ -62,9 +95,9 @@ function calculationStep(remainingOptions, previousTotal, probMod, lastDraw, dra
 function aggregate(results) {
     var prob = new Object();
     r = range(-25, 21).concat([-999])
-    r.forEach(function (value, i) {
+    r.forEach(function(value, i) {
         //prob[i] = sum([p for v, p in results if v == i])* 100
-        const filteredResults = results.filter(function (array) {
+        const filteredResults = results.filter(function(array) {
             return array.includes(value)
         })
         if (filteredResults.length != 0) {
@@ -111,30 +144,54 @@ function sumStuffDown(prob, target) {
 
 // Test it out
 
-function run(tokens, redraw_max) {
+function run(tokens, modifiers, redraw_max) {
     var allResults = []
-    // Fix
+        // Fix
     bag = makeBag(tokens)
-    calculationStep(bag, 0, 1 / bag.length, null, 1, tokens['autofail'][1], redraw_max, allResults)
+    calculationStep(bag, 0, 1 / bag.length, null, 1, tokens['autofail'][1], redraw_max, allResults, modifiers)
     cumulative = aggregate(allResults)
     return cumulative
 }
 
 function testRun(cultist_value, tablet_value, skull_value, squiggle_value, autofail_value) {
     console.log("Cultist value is ", cultist_value)
-    var options = [[1, false, 'Star']].concat(
-        [[1, false, '+1']],
-        [[0, false, '0'], [0, false, '0']],
-        [[-1, false, '-1'], [-1, false, '-1'], [-1, false, '-1']],
-        [[-2, false, '-2'], [-2, false, '-2']],
-        [[cultist_value, false, 'Cultist'], [cultist_value, false, 'Cultist']],
-        [[-3, false, '-3']],
-        [[tablet_value, false, 'Tablet']],
-        [[-4, false, '-4']],
-        [[skull_value, false, 'Skull'], [skull_value, false, 'Skull']],
-        [[squiggle_value, false, 'Squiggle'], [squiggle_value, false, 'Squiggle']],
-        [[-1, true, 'Frost'], [-1, true, 'Frost'], [-1, true, 'Frost']],
-        [[autofail_value, false, 'Autofail']]
+    var options = [
+        [1, false, 'Star']
+    ].concat(
+        [
+            [1, false, '+1']
+        ], [
+            [0, false, '0'],
+            [0, false, '0']
+        ], [
+            [-1, false, '-1'],
+            [-1, false, '-1'],
+            [-1, false, '-1']
+        ], [
+            [-2, false, '-2'],
+            [-2, false, '-2']
+        ], [
+            [cultist_value, false, 'Cultist'],
+            [cultist_value, false, 'Cultist']
+        ], [
+            [-3, false, '-3']
+        ], [
+            [tablet_value, false, 'Tablet']
+        ], [
+            [-4, false, '-4']
+        ], [
+            [skull_value, false, 'Skull'],
+            [skull_value, false, 'Skull']
+        ], [
+            [squiggle_value, false, 'Squiggle'],
+            [squiggle_value, false, 'Squiggle']
+        ], [
+            [-1, true, 'Frost'],
+            [-1, true, 'Frost'],
+            [-1, true, 'Frost']
+        ], [
+            [autofail_value, false, 'Autofail']
+        ]
     );
 
     var allResults = []
@@ -199,8 +256,8 @@ var app10 = new Vue({
     el: '#app-10',
     data: data,
     methods: {
-        getProbabilitiesMessage: function () {
-            probabilityPlot(run(this.tokens, this.redraw_max))
+        getProbabilitiesMessage: function() {
+            probabilityPlot(run(this.tokens, this.modifiers, this.redraw_max))
         }
     }
 })
