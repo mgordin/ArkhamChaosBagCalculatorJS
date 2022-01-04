@@ -355,15 +355,15 @@ var data = {
         '-6': { 'count': 0, 'value': -6, 'redraw': false, 'autofailAfter': null, 'autofail': false },
         '-7': { 'count': 0, 'value': -7, 'redraw': false, 'autofailAfter': null, 'autofail': false },
         '-8': { 'count': 0, 'value': -8, 'redraw': false, 'autofailAfter': null, 'autofail': false },
-        'skull': { 'count': 2, 'value': -2, 'redraw': false, 'autofailAfter': null, 'autofail': false },
-        'cultist': { 'count': 2, 'value': -2, 'redraw': false, 'autofailAfter': null, 'autofail': false },
-        'tablet': { 'count': 1, 'value': -3, 'redraw': false, 'autofailAfter': null, 'autofail': false },
-        'elderThing': { 'count': 2, 'value': -4, 'redraw': false, 'autofailAfter': null, 'autofail': false },
+        'skull': { 'count': 0, 'value': 0, 'redraw': false, 'autofailAfter': null, 'autofail': false },
+        'cultist': { 'count': 0, 'value': 0, 'redraw': false, 'autofailAfter': null, 'autofail': false },
+        'tablet': { 'count': 0, 'value': 0, 'redraw': false, 'autofailAfter': null, 'autofail': false },
+        'elderThing': { 'count': 0, 'value': 0, 'redraw': false, 'autofailAfter': null, 'autofail': false },
         'star': { 'count': 1, 'value': 1, 'redraw': false, 'autofailAfter': null, 'autofail': false },
         'autofail': { 'count': 1, 'value': -999, 'redraw': false, 'autofailAfter': null, 'autofail': true },
         'bless': { 'count': 0, 'value': 2, 'redraw': true, 'autofailAfter': null, 'autofail': false },
         'curse': { 'count': 0, 'value': -2, 'redraw': true, 'autofailAfter': null, 'autofail': false },
-        'frost': { 'count': 4, 'value': -1, 'redraw': true, 'autofailAfter': 'frost', 'autofail': false }
+        'frost': { 'count': 0, 'value': -1, 'redraw': true, 'autofailAfter': 'frost', 'autofail': false }
     },
     modifiers: {
         '+1': {},
