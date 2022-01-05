@@ -280,9 +280,9 @@
                             <td data-label="Count"><input v-model.number="tokens['skull']['count']" type="number" min="0" max="4"></td>
                             <td data-label="Value"><input v-model.number="tokens['skull']['value']" type="number"
                                     :disabled="tokens['skull']['autofail']"></td>
-                            <td data-label="Redraw?"><input v-model="tokens['elderThing']['redraw']" type="checkbox"
+                            <td data-label="Redraw?"><input v-model="tokens['skull']['redraw']" type="checkbox"
                                     :disabled="tokens['skull']['autofail']"></td>
-                            <td data-label="Autofail?"><input v-model="tokens['elderThing']['autofail']" type="checkbox"></td>
+                            <td data-label="Autofail?"><input v-model="tokens['skull']['autofail']" type="checkbox"></td>
                             <td data-label="Autofail if drawn after">
                                 <select v-model="tokens['skull']['autofailAfter']" :disabled="tokens['skull']['autofail']">
                                     <option v-for="option in tokenOptions" v-bind:value="option.value">
@@ -296,9 +296,9 @@
                             <td data-label="Count"><input v-model.number="tokens['cultist']['count']" type="number" min="0" max="4"></td>
                             <td data-label="Value"><input v-model.number="tokens['cultist']['value']" type="number"
                                     :disabled="tokens['cultist']['autofail']"></td>
-                            <td data-label="Redraw?"><input v-model="tokens['elderThing']['redraw']" type="checkbox"
+                            <td data-label="Redraw?"><input v-model="tokens['cultist']['redraw']" type="checkbox"
                                     :disabled="tokens['cultist']['autofail']"></td>
-                            <td data-label="Autofail?"><input v-model="tokens['elderThing']['autofail']" type="checkbox"></td>
+                            <td data-label="Autofail?"><input v-model="tokens['cultist']['autofail']" type="checkbox"></td>
                             <td data-label="Autofail if drawn after">
                                 <select v-model="tokens['cultist']['autofailAfter']" :disabled="tokens['cultist']['autofail']">
                                     <option v-for="option in tokenOptions" v-bind:value="option.value">
@@ -312,9 +312,9 @@
                             <td data-label="Count"><input v-model.number="tokens['tablet']['count']" type="number" min="0" max="4"></td>
                             <td data-label="Value"><input v-model.number="tokens['tablet']['value']" type="number"
                                     :disabled="tokens['tablet']['autofail']"></td>
-                            <td data-label="Redraw?"><input v-model="tokens['elderThing']['redraw']" type="checkbox"
+                            <td data-label="Redraw?"><input v-model="tokens['tablet']['redraw']" type="checkbox"
                                     :disabled="tokens['tablet']['autofail']"></td>
-                            <td data-label="Autofail?"><input v-model="tokens['elderThing']['autofail']" type="checkbox"></td>
+                            <td data-label="Autofail?"><input v-model="tokens['tablet']['autofail']" type="checkbox"></td>
                             <td data-label="Autofail if drawn after">
                                 <select v-model="tokens['tablet']['autofailAfter']" :disabled="tokens['tablet']['autofail']">
                                     <option v-for="option in tokenOptions" v-bind:value="option.value">
@@ -345,9 +345,9 @@
                             <td data-label="Count"><input v-model.number="tokens['bless']['count']" type="number" min="0" max="10"></td>
                             <td data-label="Value"><input v-model.number="tokens['bless']['value']" type="number"
                                     :disabled="tokens['bless']['autofail']"></td>
-                            <td data-label="Redraw?"><input v-model="tokens['elderThing']['redraw']" type="checkbox"
+                            <td data-label="Redraw?"><input v-model="tokens['bless']['redraw']" type="checkbox"
                                     :disabled="tokens['bless']['autofail']"></td>
-                            <td data-label="Autofail?"><input v-model="tokens['elderThing']['autofail']" type="checkbox"></td>
+                            <td data-label="Autofail?"><input v-model="tokens['bless']['autofail']" type="checkbox"></td>
                             <td data-label="Autofail if drawn after">
                                 <select v-model="tokens['bless']['autofailAfter']" :disabled="tokens['bless']['autofail']">
                                     <option v-for="option in tokenOptions" v-bind:value="option.value">
@@ -361,9 +361,9 @@
                             <td data-label="Count"><input v-model.number="tokens['curse']['count']" type="number" min="0" max="10"></td>
                             <td data-label="Value"><input v-model.number="tokens['curse']['value']" type="number"
                                     :disabled="tokens['curse']['autofail']"></td>
-                            <td data-label="Redraw?"><input v-model="tokens['elderThing']['redraw']" type="checkbox"
+                            <td data-label="Redraw?"><input v-model="tokens['curse']['redraw']" type="checkbox"
                                     :disabled="tokens['curse']['autofail']"></td>
-                            <td data-label="Autofail?"><input v-model="tokens['elderThing']['autofail']" type="checkbox"></td>
+                            <td data-label="Autofail?"><input v-model="tokens['curse']['autofail']" type="checkbox"></td>
                             <td data-label="Autofail if drawn after">
                                 <select v-model="tokens['curse']['autofailAfter']" :disabled="tokens['curse']['autofail']">
                                     <option v-for="option in tokenOptions" v-bind:value="option.value">
@@ -377,9 +377,9 @@
                             <td data-label="Count"><input v-model.number="tokens['frost']['count']" type="number" min="0" max="8"></td>
                             <td data-label="Value"><input v-model.number="tokens['frost']['value']" type="number"
                                     :disabled="tokens['frost']['autofail']"></td>
-                            <td data-label="Redraw?"><input v-model="tokens['elderThing']['redraw']" type="checkbox"
+                            <td data-label="Redraw?"><input v-model="tokens['frost']['redraw']" type="checkbox"
                                     :disabled="tokens['frost']['autofail']"></td>
-                            <td data-label="Autofail?"><input v-model="tokens['elderThing']['autofail']" type="checkbox"></td>
+                            <td data-label="Autofail?"><input v-model="tokens['frost']['autofail']" type="checkbox"></td>
                             <td data-label="Autofail if drawn after">
                                 <select v-model="tokens['frost']['autofailAfter']" :disabled="tokens['frost']['autofail']">
                                     <option v-for="option in tokenOptions" v-bind:value="option.value">
@@ -393,9 +393,9 @@
                             <td data-label="Count"><input v-model.number="tokens['star']['count']" type="number" min="0" max="1"></td>
                             <td data-label="Value"><input v-model.number="tokens['star']['value']" type="number"
                                     :disabled="tokens['star']['autofail']"></td>
-                            <td data-label="Redraw?"><input v-model="tokens['elderThing']['redraw']" type="checkbox"
+                            <td data-label="Redraw?"><input v-model="tokens['star']['redraw']" type="checkbox"
                                     :disabled="tokens['star']['autofail']"></td>
-                            <td data-label="Autofail?"><input v-model="tokens['elderThing']['autofail']" type="checkbox"></td>
+                            <td data-label="Autofail?"><input v-model="tokens['star']['autofail']" type="checkbox"></td>
                             <td data-label="Autofail if drawn after">
                                 <select v-model="tokens['star']['autofailAfter']" :disabled="tokens['star']['autofail']">
                                     <option v-for="option in tokenOptions" v-bind:value="option.value">
@@ -409,9 +409,9 @@
                             <td data-label="Count"><input v-model.number="tokens['autofail']['count']" type="number" min="0" max="1"></td>
                             <td data-label="Value"><input v-model.number="tokens['autofail']['value']" type="number"
                                     :disabled="tokens['autofail']['autofail']"></td>
-                            <td data-label="Redraw?"><input v-model="tokens['elderThing']['redraw']" type="checkbox"
+                            <td data-label="Redraw?"><input v-model="tokens['autofail']['redraw']" type="checkbox"
                                     :disabled="tokens['autofail']['autofail']"></td>
-                            <td data-label="Autofail?"><input v-model="tokens['elderThing']['autofail']" type="checkbox"></td>
+                            <td data-label="Autofail?"><input v-model="tokens['autofail']['autofail']" type="checkbox"></td>
                             <td data-label="Autofail if drawn after">
                                 <select v-model="tokens['autofail']['autofailAfter']"
                                     :disabled="tokens['autofail']['autofail']">
@@ -440,8 +440,6 @@
             </div>
         </div>
     </div>
-
-    
 </body>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/5.0.0/math.js"

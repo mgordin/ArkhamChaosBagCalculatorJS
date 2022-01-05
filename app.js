@@ -1272,7 +1272,7 @@ var app = new Vue({
     el: '#app',
     data: data,
     methods: {
-        getProbabilitiesMessage: function () {
+        getProbabilitiesMessage() {
             probabilityPlot(run(this.tokens, this.abilitiesActive, this.abilityEffects, this.modifiers, this.redrawMax, this.redrawHandling));
         },
         setCampaignTokens: function (event) {
