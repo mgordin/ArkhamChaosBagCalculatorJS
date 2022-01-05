@@ -1275,6 +1275,8 @@ var app = new Vue({
     methods: {
         getProbabilitiesMessage() {
             probabilityPlot(run(this.tokens, this.abilitiesActive, this.abilityEffects, this.modifiers, this.redrawMax, this.redrawHandling));
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
         },
         setCampaignTokens: function (event) {
             if (event.target.value != "custom") {
