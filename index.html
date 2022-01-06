@@ -173,7 +173,7 @@
                                     <tr>
                                         <th>Autofail if drawn after</th>
                                         <td>
-                                            <select v-model="tokens[i.k]['autofailAfter']" :disabled="tokens[i.k]['autofail']">
+                                            <select class = "select is-fullwidth" v-model="tokens[i.k]['autofailAfter']" :disabled="tokens[i.k]['autofail']">
                                                 <option v-for="option in tokenOptions" v-bind:value="option.value">
                                                     {{ option.text }}
                                                 </option>
