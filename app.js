@@ -1279,6 +1279,8 @@ var app = new Vue({
             for (const [k, v] of Object.entries(this.tokens)) {
                 if (v["count"] > 0 && (v["value"] === null || v["value"] === "")) {
                     runValid = false;
+                } else if (v["count"] === null || v["count"] === "") {
+                    runValid = false;
                 }
             }
             if (runValid) {
