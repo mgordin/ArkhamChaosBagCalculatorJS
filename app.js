@@ -387,6 +387,7 @@ var data = {
         'curse': {},
         'frost': {}
     },
+    runValid: true,
     redrawMax: 4,
     redrawHandling: "autofail",
     redrawOptions: [
@@ -1274,9 +1275,17 @@ var app = new Vue({
     data: data,
     methods: {
         getProbabilitiesMessage() {
-            probabilityPlot(run(this.tokens, this.abilitiesActive, this.abilityEffects, this.modifiers, this.redrawMax, this.redrawHandling));
-            document.body.scrollTop = 0;
-            document.documentElement.scrollTop = 0;
+            var runValid = true;
+            for (const [k, v] of Object.entries(this.tokens)) {
+                if (v["count"] > 0 && (v["value"] === null || v["value"] === "")) {
+                    runValid = false;
+                }
+            }
+            if (runValid) {
+                probabilityPlot(run(this.tokens, this.abilitiesActive, this.abilityEffects, this.modifiers, this.redrawMax, this.redrawHandling));
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }
         },
         setCampaignTokens: function (event) {
             if (event.target.value != "custom") {
