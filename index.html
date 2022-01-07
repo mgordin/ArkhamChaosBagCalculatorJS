@@ -95,7 +95,10 @@
                 redraws to calculate, and how to resolve redraws past that max. Clicking the "Plot redraw probabilities"
                 button below will plot the probability of getting 1 - 10 redraws given your current token settings -
                 i.e., what part of your overall token draw probability will be incorrect for a redraw max below your
-                actual possible redraws. This can help inform what you set "Redraw max" to.</p>
+                actual possible redraws. This can help inform what you set "Redraw max" to.
+            
+                For most cases, keeping your redraw max to 5 or lower is probably best, as this leaves little redraw chance
+                unaccounted for, but the calculation runs in a manageable time.</p>
             <br>
             <div>Redraw max: <input v-model.number="redrawMax" type="number"></div>
             <div>How to resolve redraw over max:
