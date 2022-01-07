@@ -13,7 +13,7 @@
         <nav class="navbar is-light has-shadow is-fixed-top">
             <div class="navbar-menu">
                 <div class="navbar-start">
-                    <a class="navbar-item" href="https://mgordin.github.io/">
+                    <a class="navbar-item" href="https://arkhamchaosbag.com/">
                         <img src="Elder Sign.png" height="60">
                     </a>
                     <span class="navbar-item">
@@ -23,7 +23,7 @@
 
                 <div class="navbar-end">
                     <div class="navbar-item">
-                        <a href="https://github.com/mgordin/ArkhamChaosBagCalculatorJS" alt="Github Link" class="button is-light"><i
+                        <a href="https://github.com/mgordin/ArkhamChaosBagCalculatorJS" alt="Github Link" class="button is-white"><i
                                 class="fab fa-github"></i></a>
                     </div>
                     <div class="navbar-item">
@@ -41,6 +41,24 @@
                 </div>
             </div>
         </nav>
+
+        <div class="modal" v-bind:class="{ 'is-active' : modalOpen }">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                  <p class="modal-card-title">Error in token configuration</p>
+                  <button class="delete" v-on:click="closeModal" aria-label="close"></button>
+                </header>
+                <section class="modal-card-body">
+                    <p>The count or value for the following tokens are empty, so the calculation couldn't be run - fill them in and try again:</p>
+                    <ul>
+                        <li v-for="issue in modalIssueList">
+                            {{ issue }}
+                        </li>
+                    </ul>
+                </section>
+              </div>
+        </div>
 
         <div id='probPlot' >
             <!-- Plotly chart will be drawn inside this DIV -->
@@ -119,8 +137,8 @@
                     <tbody v-for="i in orderedTokens">
                         <tr>
                             <th>{{ tokens[i.k].fullName }}</th>
-                            <td><input class="input is-fullwidth" v-model.number="tokens[i.k]['count']" type="number" min="0" max="4"></td>
-                            <td><input class="input is-fullwidth" v-model.number="tokens[i.k]['value']" type="number"
+                            <td><input class="input is-fullwidth" v-bind:class="{ 'is-danger' : (tokens[i.k]['count']===null || tokens[i.k]['count']==='') }" v-model.number="tokens[i.k]['count']" type="number" min="0" max="4"></td>
+                            <td><input class="input is-fullwidth" v-bind:class="{ 'is-danger' : (tokens[i.k]['value']===null || tokens[i.k]['value']==='') }" v-model.number="tokens[i.k]['value']" type="number"
                                     :disabled="tokens[i.k]['autofail']"></td>
                             <td><input class="checkbox is-fullwidth" v-model="tokens[i.k]['redraw']" type="checkbox" :disabled="tokens[i.k]['autofail']">
                             </td>
@@ -149,13 +167,13 @@
                                     <tr>
                                         <th>Count</th>
                                         <td>
-                                            <input class="input is-fullwidth" v-model.number="tokens[i.k]['count']" type="number" min="0" max="1">
+                                            <input class="input is-fullwidth" v-bind:class="{ 'is-danger' : (tokens[i.k]['count']===null || tokens[i.k]['count']==='') }" v-model.number="tokens[i.k]['count']" type="number" min="0" max="1">
                                         </td>
                                     </tr>
                                     <tr>
                                         <th>Value</th>
                                         <td>
-                                            <input class="input is-fullwidth" v-model.number="tokens[i.k]['value']" type="number"
+                                            <input class="input is-fullwidth" v-bind:class="{ 'is-danger' : (tokens[i.k]['value']===null || tokens[i.k]['value']==='') }" v-model.number="tokens[i.k]['value']" type="number"
                                                 :disabled="tokens[i.k]['autofail']">
                                         </td>
                                     </tr>

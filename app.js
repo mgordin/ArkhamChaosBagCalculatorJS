@@ -387,7 +387,8 @@ var data = {
         'curse': {},
         'frost': {}
     },
-    runValid: true,
+    modalOpen: false,
+    modalIssueList: [],
     redrawMax: 4,
     redrawHandling: "autofail",
     redrawOptions: [
@@ -1276,15 +1277,23 @@ var app = new Vue({
     methods: {
         getProbabilitiesMessage() {
             var runValid = true;
+            this.modalIssueList = []
             for (const [k, v] of Object.entries(this.tokens)) {
                 if (v["count"] > 0 && (v["value"] === null || v["value"] === "")) {
                     runValid = false;
+                    this.modalIssueList.push(v["fullName"])
                 } else if (v["count"] === null || v["count"] === "") {
                     runValid = false;
+                    this.modalIssueList.push(v["fullName"])
                 }
             }
+            if (!(runValid)) {
+                this.modalOpen = true;
+            }
             if (runValid) {
+                var startTime = Date.now()
                 probabilityPlot(run(this.tokens, this.abilitiesActive, this.abilityEffects, this.modifiers, this.redrawMax, this.redrawHandling));
+                console.log('This took this many ms: ', Date.now() - startTime)
                 document.body.scrollTop = 0;
                 document.documentElement.scrollTop = 0;
             }
@@ -1299,6 +1308,9 @@ var app = new Vue({
         },
         updateRedrawsPlot: function () {
             redrawsPlot(this.tokens, 10)
+        },
+        closeModal: function () {
+            this.modalOpen = false;
         }
     },
     computed: {
