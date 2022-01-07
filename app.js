@@ -95,10 +95,10 @@ function getTokenRange(tokens) {
     return [min + minSingle, max + maxSingle];
 }
 
-function handleTooManyRedraws(total, tokens, handling, autofail_value) {
+function handleTooManyRedraws(total, tokens, handling, autofail_value, resultsTracker, probMod) {
     var tokenRegex = /t(\+|-)\d/;
     if (handling == "autofail") {
-        return autofail_value;
+        addToResultsTracker(resultsTracker, total, probMod, autofail_value, true);
     } else if (handling == "median") {
         var tokenValues = []
         tokens.forEach(function (token, i) {
@@ -107,7 +107,7 @@ function handleTooManyRedraws(total, tokens, handling, autofail_value) {
             }
         });
         var tokenMedian = Math.floor(math.median(tokenValues));
-        return total + tokenMedian;
+        addToResultsTracker(resultsTracker, total + tokenMedian, probMod, autofail_value, false);
     } else if (handling == "average") {
         var tokenValues = []
         tokens.forEach(function (token, i) {
@@ -116,51 +116,50 @@ function handleTooManyRedraws(total, tokens, handling, autofail_value) {
             }
         });
         var tokenAverage = Math.floor(math.mean(tokenValues));
-        return total + tokenAverage;
+        addToResultsTracker(resultsTracker, total + tokenAverage, probMod, autofail_value, false);
     } else if (tokenRegex.test(handling)) {
         var tokenValue = parseInt(handling.substring(1))
-        return total + tokenValue;
+        addToResultsTracker(resultsTracker, total + tokenValue, probMod, autofail_value, false);
     } else {
         console.log("Handling for too many redraws hit an unrecognized 'handling' parameter")
     }
 }
 
-function calculationStep(remainingOptions, previousTotal, probMod, lastDraw, drawCount, autofail_value, redrawMax, allResults, modifiers, redrawHandling) {
+function addToResultsTracker(resultsTracker, total, probMod, autofailValue, isAutofail) {
+    if (total == autofailValue || isAutofail) {
+        //pass
+    } else if (total > 1) {
+        resultsTracker[2] += probMod * 100;
+    } else if (total == 1) {
+        resultsTracker[1] += probMod * 100;
+    } else if (total >= -8) {
+        resultsTracker[total] += probMod * 100;
+    }
+}
+
+function calculationStep(remainingOptions, previousTotal, probMod, lastDraw, drawCount, autofail_value, redrawMax, resultsTracker, modifiers, redrawHandling) {
     remainingOptions.forEach(function (token, i) {
         // Calculate result, assuming now additional stuff happening
+        var total = calculateTotal(previousTotal, token, modifiers)
         if (token["value"] == autofail_value || token["autofail"]) { // Special case so autofail always has same value / to recognize autofail checkbox
-            allResults.push([autofail_value, probMod]);
+            addToResultsTracker(resultsTracker, total, probMod, autofail_value, true)
         } else if (lastDraw && lastDraw == token["autofailAfter"]) { // If the previous draw would make this an autofail, do that
-            allResults.push([autofail_value, probMod]);
+            addToResultsTracker(resultsTracker, total, probMod, autofail_value, true)
         } else if (token["redraw"] && modifiers[token["name"]]["param"] != 'noRedraw') { // If this is a token that prompts a redraw, do that
             var total = calculateTotal(previousTotal, token, modifiers)
             if (drawCount + 1 > redrawMax) { // If this draw is too many redraws - treat as an autofail to speed up calculation
-                allResults.push([handleTooManyRedraws(total, remainingOptions, redrawHandling, autofail_value), probMod]);
+                handleTooManyRedraws(total, remainingOptions, redrawHandling, autofail_value, resultsTracker, probMod)
             } else {
                 calculationStep(
-                    remainingOptions.slice(0, i).concat(remainingOptions.slice(i + 1)), total, probMod / (remainingOptions.length - 1), token["name"], drawCount + 1, autofail_value, redrawMax, allResults, modifiers, redrawHandling)
+                    remainingOptions.slice(0, i).concat(remainingOptions.slice(i + 1)), total, probMod / (remainingOptions.length - 1), token["name"], drawCount + 1, autofail_value, redrawMax, resultsTracker, modifiers, redrawHandling)
             }
         } else { // No redraw - just spit out the current total and probability
-            var total = calculateTotal(previousTotal, token, modifiers)
-            allResults.push([total, probMod]);
+            addToResultsTracker(resultsTracker, total, probMod, autofail_value, false)
         }
     });
 }
 
-function aggregate(results, bag) {
-    var prob = new Object();
-    var tokenRange = getTokenRange(bag)
-    r = range(tokenRange[0], tokenRange[1]).concat([-999])
-    r.forEach(function (value, i) {
-        const filteredResults = results.filter(function (array) {
-            return array.includes(value)
-        })
-        if (filteredResults.length != 0) {
-            const probSumFunction = (sum, curr) => sum + curr[1];
-            prob[value] = filteredResults.reduce(probSumFunction, 0) * 100;
-        }
-    })
-
+function cumulativeProb(prob) {
     var probCumul = new Object();
     probCumul[-2] = sumStuffUp(prob, 1);
     probCumul[-1] = sumStuffUp(prob, 0);
@@ -170,9 +169,11 @@ function aggregate(results, bag) {
     probCumul[3] = sumStuffUp(prob, -4);
     probCumul[4] = sumStuffUp(prob, -5);
     probCumul[5] = sumStuffUp(prob, -6);
-    probCumul[6] = sumStuffDown(prob, -6);
+    probCumul[6] = sumStuffUp(prob, -7);
+    probCumul[7] = sumStuffUp(prob, -8);
+    probCumul[8] = sumStuffUp(prob, -9);
 
-    return probCumul
+    return probCumul;
 }
 
 function sumStuffUp(prob, target) {
@@ -194,13 +195,17 @@ function sumStuffDown(prob, target) {
     }
     return temp;
 }
-
-function redrawProb(allProbs, prob, allCount, redrawCount, currentN, maxN) {
-    var newProb = prob * redrawCount / allCount
-    allProbs.push(Math.round(newProb * 100))
-    if ((currentN + 1) <= maxN) {
-        redrawProb(allProbs, newProb, allCount - 1, redrawCount - 1, currentN + 1, maxN)
+function run(tokens, abilitiesActive, abilityEffects, modifiers, redrawMax, redrawHandling) {
+    var resultsTracker = {};
+    for (let i = -8; i < 3; i++) {
+        resultsTracker[i] = 0;
     }
+    var bag = makeBag(tokens);
+    prepareModifiers(abilitiesActive, abilityEffects, modifiers);
+    calculationStep(bag, 0, 1 / bag.length, null, 1, tokens['autofail']["value"], redrawMax, resultsTracker, modifiers, redrawHandling);
+    var cumulative = cumulativeProb(resultsTracker);
+    saveData(saveName, data);
+    return cumulative
 }
 
 function chanceOfNRedraws(tokens, maxN) {
@@ -217,6 +222,16 @@ function chanceOfNRedraws(tokens, maxN) {
 
     return redrawProbs
 }
+
+
+function redrawProb(allProbs, prob, allCount, redrawCount, currentN, maxN) {
+    var newProb = prob * redrawCount / allCount
+    allProbs.push(Math.round(newProb * 100))
+    if ((currentN + 1) <= maxN) {
+        redrawProb(allProbs, newProb, allCount - 1, redrawCount - 1, currentN + 1, maxN)
+    }
+}
+
 
 function redrawsPlot(tokens, maxN) {
     xValue = range(1, maxN);
@@ -270,19 +285,8 @@ function redrawsPlot(tokens, maxN) {
 
 }
 
-function run(tokens, abilitiesActive, abilityEffects, modifiers, redrawMax, redrawHandling) {
-    var allResults = [];
-    var bag = makeBag(tokens);
-    prepareModifiers(abilitiesActive, abilityEffects, modifiers);
-    calculationStep(bag, 0, 1 / bag.length, null, 1, tokens['autofail']["value"], redrawMax, allResults, modifiers, redrawHandling);
-    var cumulative = aggregate(allResults, bag);
-    saveData(saveName, data);
-
-    return cumulative
-}
-
 function probabilityPlot(p) {
-    var xValue = range(-2, 5);
+    var xValue = range(-2, 8);
     var yValue = [
         Math.round(p[-2]),
         Math.round(p[-1]),
@@ -291,8 +295,12 @@ function probabilityPlot(p) {
         Math.round(p[2]),
         Math.round(p[3]),
         Math.round(p[4]),
-        Math.round(p[5])
+        Math.round(p[5]),
+        Math.round(p[6]),
+        Math.round(p[7]),
+        Math.round(p[8])
     ];
+
     var textValueRaw = yValue.map(String)
     var textValue = []
     textValueRaw.forEach(function (val, i) {
@@ -1291,9 +1299,7 @@ var app = new Vue({
                 this.modalOpen = true;
             }
             if (runValid) {
-                var startTime = Date.now()
                 probabilityPlot(run(this.tokens, this.abilitiesActive, this.abilityEffects, this.modifiers, this.redrawMax, this.redrawHandling));
-                console.log('This took this many ms: ', Date.now() - startTime)
                 document.body.scrollTop = 0;
                 document.documentElement.scrollTop = 0;
             }
