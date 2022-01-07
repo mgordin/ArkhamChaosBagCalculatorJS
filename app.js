@@ -395,8 +395,10 @@ var data = {
         'curse': {},
         'frost': {}
     },
-    modalOpen: false,
+    modalTokenIssueOpen: false,
     modalIssueList: [],
+    modalRedrawAlertOpen: false,
+    modalRedrawMaxOpen: false,
     redrawMax: 4,
     redrawHandling: "autofail",
     redrawOptions: [
@@ -1277,6 +1279,19 @@ let tryData = loadData(saveName)
 if (tryData != null && checkStoredData(tryData, data)) {
     data = tryData
 }
+
+var redrawCount = 0
+for (const [k, v] of Object.entries(data.tokens)) {
+    if (v["redraw"]) {
+        redrawCount += v["count"];
+    }
+}
+
+if (redrawCount > 20 && data.redrawMax > 5) {
+    data.redrawMax = 4;
+    data.modalRedrawAlertOpen = true;
+}
+
 probabilityPlot(run(data.tokens, data.abilitiesActive, data.abilityEffects, data.modifiers, data.redrawMax, data.redrawHandling))
 
 var app = new Vue({
@@ -1285,18 +1300,25 @@ var app = new Vue({
     methods: {
         getProbabilitiesMessage() {
             var runValid = true;
+            var runIssue = null;
             this.modalIssueList = []
             for (const [k, v] of Object.entries(this.tokens)) {
                 if (v["count"] > 0 && (v["value"] === null || v["value"] === "")) {
                     runValid = false;
+                    runIssue = "token";
                     this.modalIssueList.push(v["fullName"])
                 } else if (v["count"] === null || v["count"] === "") {
                     runValid = false;
+                    runIssue = "token";
                     this.modalIssueList.push(v["fullName"])
                 }
             }
-            if (!(runValid)) {
-                this.modalOpen = true;
+            if (this.redrawMax === null || this.redrawMax === "") {
+                runValid = false;
+                this.modalRedrawMaxOpen = true;
+            }
+            if (!(runValid) && runIssue == "token") {
+                this.modalTokenIssueOpen = true;
             }
             if (runValid) {
                 probabilityPlot(run(this.tokens, this.abilitiesActive, this.abilityEffects, this.modifiers, this.redrawMax, this.redrawHandling));
@@ -1315,8 +1337,14 @@ var app = new Vue({
         updateRedrawsPlot: function () {
             redrawsPlot(this.tokens, 10)
         },
-        closeModal: function () {
-            this.modalOpen = false;
+        closeModalTokenIssue: function () {
+            this.modalTokenIssueOpen = false;
+        },
+        closeModalRedrawAlert: function () {
+            this.modalRedrawAlertOpen = false;
+        },
+        closeModalRedrawMax: function () {
+            this.modalRedrawMaxOpen = false;
         }
     },
     computed: {
