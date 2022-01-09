@@ -1,9 +1,12 @@
 //  ---------------- Function definitions ------------------
 
+// Save current state of the data object to the browser's local storage as JSON
 function saveData(name, data) {
     localStorage.setItem(name, JSON.stringify(data));
 }
 
+/* Check if the structure of the data object stored as JSON in the browser's
+local storage matches the structure of current default data object. */
 function checkStoredData(loadedData, defaultData) {
     var keysLoaded = Object.keys(loadedData),
         keysDefault = Object.keys(defaultData);
@@ -15,13 +18,15 @@ function checkStoredData(loadedData, defaultData) {
                 : true));
 }
 
+/* Load the data object stored as JSON in the browser's local storage as a repacement
+for the default data boject */
 function loadData(name) {
     var loaded = JSON.parse(localStorage.getItem(name));
     return loaded
 }
 
-// Bag is a list of lists, each interior list is one token as 
-// [value as number, redraw as boolean, name as string, autofail after as string]
+/* Generate the "bag" of tokens - an array with one object per token in the bag whose
+draw probabilities are to be calculated */
 function makeBag(tokens) {
     var bag = []
     for (const [token_name, token] of Object.entries(tokens)) {
@@ -38,6 +43,8 @@ function makeBag(tokens) {
     return bag
 }
 
+/* Go through the active abilities selected, and prepare modifiers to token values based 
+on those */
 function prepareModifiers(abilitiesActive, abilityEffects, modifiers) {
     for (const [k, v] of Object.entries(modifiers)) {
         modifiers[k] = {};
@@ -56,12 +63,14 @@ function prepareModifiers(abilitiesActive, abilityEffects, modifiers) {
     }
 }
 
-// Functions
+// Generate an array of numbers from start value to end value incremented by one
 function range(start, end) {
     if (start === end) return [start];
     return [start, ...range(start + 1, end)];
 }
 
+/* Calculate the total of drawing a token, potentially after drawing other tokens
+and with some set of modifiers to the value */
 function calculateTotal(previousTotal, token, modifiers) {
     var total = previousTotal + token["value"];
     if (Object.keys(modifiers[token["name"]]).length != 0) {
@@ -74,6 +83,8 @@ function calculateTotal(previousTotal, token, modifiers) {
     return total
 }
 
+/* Find the max and min possible totals that the current bag of tokens could results in drawing,
+given however many redraws are present */
 function getTokenRange(tokens) {
     var max = 0;
     var maxSingle = -999;
@@ -95,6 +106,7 @@ function getTokenRange(tokens) {
     return [min + minSingle, max + maxSingle];
 }
 
+/* What to do if there are more redraws than redrawMax */
 function handleTooManyRedraws(total, tokens, handling, autofail_value, resultsTracker, probMod) {
     var tokenRegex = /t(\+|-)\d/;
     if (handling == "autofail") {
@@ -125,6 +137,7 @@ function handleTooManyRedraws(total, tokens, handling, autofail_value, resultsTr
     }
 }
 
+/* Handle the final result of a draw */
 function addToResultsTracker(resultsTracker, total, probMod, autofailValue, isAutofail) {
     if (total == autofailValue || isAutofail) {
         //pass
@@ -137,6 +150,7 @@ function addToResultsTracker(resultsTracker, total, probMod, autofailValue, isAu
     }
 }
 
+/* Pull a token and resolve its value - called recursively for redraws */
 function calculationStep(remainingOptions, previousTotal, probMod, lastDraw, drawCount, autofail_value, redrawMax, resultsTracker, modifiers, redrawHandling) {
     remainingOptions.forEach(function (token, i) {
         // Calculate result, assuming now additional stuff happening
@@ -159,6 +173,7 @@ function calculationStep(remainingOptions, previousTotal, probMod, lastDraw, dra
     });
 }
 
+/* Get the cumulative probability of success with X+ given each specific value's probability */
 function cumulativeProb(prob) {
     var probCumul = new Object();
     probCumul[-2] = sumStuffUp(prob, 1);
@@ -176,6 +191,7 @@ function cumulativeProb(prob) {
     return probCumul;
 }
 
+/* Sum for above X skill value, for cumulative probability */
 function sumStuffUp(prob, target) {
     var temp = 0;
     for (const [k, v] of Object.entries(prob)) {
@@ -186,6 +202,7 @@ function sumStuffUp(prob, target) {
     return temp;
 }
 
+/* Sum for X skill value and below, for probability of failure */
 function sumStuffDown(prob, target) {
     var temp = 0;
     for (const [k, v] of Object.entries(prob)) {
@@ -195,6 +212,8 @@ function sumStuffDown(prob, target) {
     }
     return temp;
 }
+
+/* Do all the steps of calculating success chance for all relevant skill values */
 function run(tokens, abilitiesActive, abilityEffects, modifiers, redrawMax, redrawHandling) {
     var resultsTracker = {};
     for (let i = -8; i < 3; i++) {
@@ -208,6 +227,8 @@ function run(tokens, abilitiesActive, abilityEffects, modifiers, redrawMax, redr
     return cumulative
 }
 
+/* Set up to calculate the chance of redrawing 1 to N times  given the current bag,
+then call redrawProb to actually calculate those odds */
 function chanceOfNRedraws(tokens, maxN) {
     var redrawTokensCount = 0;
     var allTokensCount = 0;
@@ -223,7 +244,7 @@ function chanceOfNRedraws(tokens, maxN) {
     return redrawProbs
 }
 
-
+/* Actually calculate the chance of redrawing 1 to N times */
 function redrawProb(allProbs, prob, allCount, redrawCount, currentN, maxN) {
     var newProb = prob * redrawCount / allCount
     allProbs.push(Math.round(newProb * 100))
@@ -232,7 +253,7 @@ function redrawProb(allProbs, prob, allCount, redrawCount, currentN, maxN) {
     }
 }
 
-
+/* Plot chance of 1 to N redraws given the current bag */
 function redrawsPlot(tokens, maxN) {
     xValue = range(1, maxN);
     yValue = chanceOfNRedraws(tokens, maxN);
@@ -285,6 +306,7 @@ function redrawsPlot(tokens, maxN) {
 
 }
 
+/* Plot of success chance at each skill minus difficulty value */
 function probabilityPlot(p) {
     var xValue = range(-2, 8);
     var yValue = [
@@ -348,7 +370,7 @@ function probabilityPlot(p) {
 
 //  ---------------- Set up the page and params ------------------
 
-// Params
+/* Setting up starting / general data and params */
 var saveName = "mgArkhamChaosBagData"
 var data = {
     // [count, value, redraw, autofail-if-after, is-autofail]
@@ -426,8 +448,8 @@ var data = {
         { text: "Cultist", value: "cultist" },
         { text: "Elder Thing", value: "elderThing" },
         { text: "Frost", value: "frost" },
-        { text: "Tablet", value: "tablet" },
-        { text: "Skull", value: "skull" }
+        { text: "Skull", value: "skull" },
+        { text: "Tablet", value: "tablet" }
 
     ],
     abilitiesActive: [],
@@ -1275,11 +1297,13 @@ var data = {
     }
 }
 
+// Load data if its structure matches that of the current default
 let tryData = loadData(saveName)
 if (tryData != null && checkStoredData(tryData, data)) {
     data = tryData
 }
 
+// Check max possible redraws given the current bag
 var redrawCount = 0
 for (const [k, v] of Object.entries(data.tokens)) {
     if (v["redraw"]) {
@@ -1287,18 +1311,22 @@ for (const [k, v] of Object.entries(data.tokens)) {
     }
 }
 
+/* Reset redrawMax to a lower value if it, and the max number of possible redraws,
+are high enough that they might make the initial page load slow */
 if (redrawCount > 20 && data.redrawMax > 5) {
     data.redrawMax = 4;
     data.modalRedrawAlertOpen = true;
 }
 
+// Generate the probability plot given the initial bag composition
 probabilityPlot(run(data.tokens, data.abilitiesActive, data.abilityEffects, data.modifiers, data.redrawMax, data.redrawHandling))
 
+// Set up the Vue.js stuff
 var app = new Vue({
     el: '#app',
     data: data,
     methods: {
-        getProbabilitiesMessage() {
+        calculateProbabilities() {
             var runValid = true;
             var runIssue = null;
             this.modalIssueList = []
