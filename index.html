@@ -6,6 +6,23 @@
 <head>
     <title>Arkham Horror Chaos Bag Probability Calculator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
 </head>
 
 <body>
@@ -23,8 +40,8 @@
 
                 <div class="navbar-end">
                     <div class="navbar-item">
-                        <a href="https://github.com/mgordin/ArkhamChaosBagCalculatorJS" alt="Github Link" class="button is-white"><i
-                                class="fab fa-github"></i></a>
+                        <a href="https://github.com/mgordin/ArkhamChaosBagCalculatorJS" alt="Github Link"
+                            class="button is-white"><i class="fab fa-github"></i></a>
                     </div>
                     <div class="navbar-item">
                         <button class="button is-primary" v-on:click="getProbabilitiesMessage">Calculate
@@ -46,50 +63,53 @@
             <div class="modal-background"></div>
             <div class="modal-card">
                 <header class="modal-card-head">
-                  <p class="modal-card-title">Error in token configuration</p>
-                  <button class="delete" v-on:click="closeModalTokenIssue" aria-label="close"></button>
+                    <p class="modal-card-title">Error in token configuration</p>
+                    <button class="delete" v-on:click="closeModalTokenIssue" aria-label="close"></button>
                 </header>
                 <section class="modal-card-body">
-                    <p>The count or value for the following tokens are empty, so the calculation couldn't be run - fill them in and try again:</p>
+                    <p>The count or value for the following tokens are empty, so the calculation couldn't be run - fill
+                        them in and try again:</p>
                     <ul>
                         <li v-for="issue in modalIssueList">
                             {{ issue }}
                         </li>
                     </ul>
                 </section>
-              </div>
+            </div>
         </div>
 
         <div class="modal" v-bind:class="{ 'is-active' : modalRedrawMaxOpen }">
             <div class="modal-background"></div>
             <div class="modal-card">
                 <header class="modal-card-head">
-                  <p class="modal-card-title">Error in token configuration</p>
-                  <button class="delete" v-on:click="closeModalRedrawMax" aria-label="close"></button>
+                    <p class="modal-card-title">Error in token configuration</p>
+                    <button class="delete" v-on:click="closeModalRedrawMax" aria-label="close"></button>
                 </header>
                 <section class="modal-card-body">
                     <p>Please enter a value for redraw max (in the Settings tab) and try again.</p>
                 </section>
-              </div>
+            </div>
         </div>
 
         <div class="modal" v-bind:class="{ 'is-active' : modalRedrawAlertOpen }">
             <div class="modal-background"></div>
             <div class="modal-card">
                 <header class="modal-card-head">
-                  <p class="modal-card-title">Your redraw max has been reset</p>
-                  <button class="delete" v-on:click="closeModalRedrawAlert" aria-label="close"></button>
+                    <p class="modal-card-title">Your redraw max has been reset</p>
+                    <button class="delete" v-on:click="closeModalRedrawAlert" aria-label="close"></button>
                 </header>
                 <section class="modal-card-body">
                     <p>You have over 20 tokens that prompt redraws in the bag, and your redraw max is set to 6 or more.
-                        That could take quite a while to finish calculating - so, instead, your redraw max has been reset
-                        to 4, so the page will load promptly.  You can manually reset it to any value you want in Settings.
+                        That could take quite a while to finish calculating - so, instead, your redraw max has been
+                        reset
+                        to 4, so the page will load promptly. You can manually reset it to any value you want in
+                        Settings.
                     </p>
                 </section>
-              </div>
+            </div>
         </div>
 
-        <div id='probPlot' >
+        <div id='probPlot'>
             <!-- Plotly chart will be drawn inside this DIV -->
         </div>
 
@@ -125,8 +145,9 @@
                 button below will plot the probability of getting 1 - 10 redraws given your current token settings -
                 i.e., what part of your overall token draw probability will be incorrect for a redraw max below your
                 actual possible redraws. This can help inform what you set "Redraw max" to.
-            
-                For most cases, keeping your redraw max to 5 or lower is probably best, as this leaves little redraw chance
+
+                For most cases, keeping your redraw max to 5 or lower is probably best, as this leaves little redraw
+                chance
                 unaccounted for, but the calculation runs in a manageable time.</p>
             <br>
             <div>Redraw max: <input v-model.number="redrawMax" type="number"></div>
@@ -153,7 +174,7 @@
                     {{ option.text }}
                 </option>
             </select>
-            
+
             <div class="block pr-3 pl-3 is-hidden-touch">
                 <table class="table is-fullwidth">
                     <thead>
@@ -169,14 +190,21 @@
                     <tbody v-for="i in orderedTokens">
                         <tr>
                             <th>{{ tokens[i.k].fullName }}</th>
-                            <td><input class="input is-fullwidth" v-bind:class="{ 'is-danger' : (tokens[i.k]['count']===null || tokens[i.k]['count']==='') }" v-model.number="tokens[i.k]['count']" type="number" min="0" max="4"></td>
-                            <td><input class="input is-fullwidth" v-bind:class="{ 'is-danger' : (tokens[i.k]['value']===null || tokens[i.k]['value']==='') }" v-model.number="tokens[i.k]['value']" type="number"
+                            <td><input class="input is-fullwidth"
+                                    v-bind:class="{ 'is-danger' : (tokens[i.k]['count']===null || tokens[i.k]['count']==='') }"
+                                    v-model.number="tokens[i.k]['count']" type="number" min="0" max="4"></td>
+                            <td><input class="input is-fullwidth"
+                                    v-bind:class="{ 'is-danger' : (tokens[i.k]['value']===null || tokens[i.k]['value']==='') }"
+                                    v-model.number="tokens[i.k]['value']" type="number"
                                     :disabled="tokens[i.k]['autofail']"></td>
-                            <td><input class="checkbox is-fullwidth" v-model="tokens[i.k]['redraw']" type="checkbox" :disabled="tokens[i.k]['autofail']">
+                            <td><input class="checkbox is-fullwidth" v-model="tokens[i.k]['redraw']" type="checkbox"
+                                    :disabled="tokens[i.k]['autofail']">
                             </td>
-                            <td><input class="checkbox is-fullwidth" v-model="tokens[i.k]['autofail']" type="checkbox"></td>
+                            <td><input class="checkbox is-fullwidth" v-model="tokens[i.k]['autofail']" type="checkbox">
+                            </td>
                             <td>
-                                <select class="select is-fullwidth" v-model="tokens[i.k]['autofailAfter']" :disabled="tokens[i.k]['autofail']">
+                                <select class="select is-fullwidth" v-model="tokens[i.k]['autofailAfter']"
+                                    :disabled="tokens[i.k]['autofail']">
                                     <option v-for="option in tokenOptions" v-bind:value="option.value">
                                         {{ option.text }}
                                     </option>
@@ -186,7 +214,7 @@
                     </tbody>
                 </table>
             </div>
-            
+
             <div class="block pr-3 pl-3 is-hidden-desktop">
                 <div class="tile is-ancestor">
                     <div class="tile is-vertical is-parent is-8">
@@ -196,45 +224,51 @@
                             </div>
                             <table class="table is-fullwidth">
                                 </tbody>
-                                    <tr>
-                                        <th>Count</th>
-                                        <td>
-                                            <input class="input is-fullwidth" v-bind:class="{ 'is-danger' : (tokens[i.k]['count']===null || tokens[i.k]['count']==='') }" v-model.number="tokens[i.k]['count']" type="number" min="0" max="1">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Value</th>
-                                        <td>
-                                            <input class="input is-fullwidth" v-bind:class="{ 'is-danger' : (tokens[i.k]['value']===null || tokens[i.k]['value']==='') }" v-model.number="tokens[i.k]['value']" type="number"
-                                                :disabled="tokens[i.k]['autofail']">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Redraw?</th>
-                                        <td>
-                                            <input v-model="tokens[i.k]['redraw']" type="checkbox" :disabled="tokens[i.k]['autofail']">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Autofail?</th>
-                                        <td>
-                                            <input v-model="tokens[i.k]['autofail']" type="checkbox">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Autofail if drawn after</th>
-                                        <td>
-                                            <select class = "select is-fullwidth" v-model="tokens[i.k]['autofailAfter']" :disabled="tokens[i.k]['autofail']">
-                                                <option v-for="option in tokenOptions" v-bind:value="option.value">
-                                                    {{ option.text }}
-                                                </option>
-                                            </select>
-                                        </td>
-                                    </tr>
+                                <tr>
+                                    <th>Count</th>
+                                    <td>
+                                        <input class="input is-fullwidth"
+                                            v-bind:class="{ 'is-danger' : (tokens[i.k]['count']===null || tokens[i.k]['count']==='') }"
+                                            v-model.number="tokens[i.k]['count']" type="number" min="0" max="1">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Value</th>
+                                    <td>
+                                        <input class="input is-fullwidth"
+                                            v-bind:class="{ 'is-danger' : (tokens[i.k]['value']===null || tokens[i.k]['value']==='') }"
+                                            v-model.number="tokens[i.k]['value']" type="number"
+                                            :disabled="tokens[i.k]['autofail']">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Redraw?</th>
+                                    <td>
+                                        <input v-model="tokens[i.k]['redraw']" type="checkbox"
+                                            :disabled="tokens[i.k]['autofail']">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Autofail?</th>
+                                    <td>
+                                        <input v-model="tokens[i.k]['autofail']" type="checkbox">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Autofail if drawn after</th>
+                                    <td>
+                                        <select class="select is-fullwidth" v-model="tokens[i.k]['autofailAfter']"
+                                            :disabled="tokens[i.k]['autofail']">
+                                            <option v-for="option in tokenOptions" v-bind:value="option.value">
+                                                {{ option.text }}
+                                            </option>
+                                        </select>
+                                    </td>
+                                </tr>
                                 </tbody>
                             </table>
                         </article>
-                        
+
                     </div>
                 </div>
             </div>
