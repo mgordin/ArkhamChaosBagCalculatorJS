@@ -162,7 +162,7 @@
             <div>
                 <button class="button is-primary" v-on:click="updateRedrawsPlot">Plot redraw probabilities</button>
             </div>
-            <div id='redrawsPlot'>
+            <div id='redrawsPlot' v-if="whichBlock == 'settings'">
                 <!-- Plotly chart will be drawn inside this DIV -->
             </div>
 
@@ -193,7 +193,7 @@
                             <th>{{ tokens[i.k].fullName }}</th>
                             <td><input class="input is-fullwidth"
                                     v-bind:class="{ 'is-danger' : (tokens[i.k]['count']===null || tokens[i.k]['count']==='') }"
-                                    v-model.number="tokens[i.k]['count']" type="number" min="0" max="4"></td>
+                                    v-model.number="tokens[i.k]['count']" type="number" min="0" max="10"></td>
                             <td><input class="input is-fullwidth"
                                     v-bind:class="{ 'is-danger' : (tokens[i.k]['value']===null || tokens[i.k]['value']==='') }"
                                     v-model.number="tokens[i.k]['value']" type="number"
